@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+
+    <style>
+        *,
+        *:before,
+        *:after {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+
+      .form-group {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <form onsubmit="handleSubmit(event)" id="statsForm">
+        <fieldset>
+            <div class="form-group">
+                <label for="total">Total:</label>
+                <input type="text" id="total" name="total" />
+            </div>
+
+            <div class="form-group">
+                <label for="mid">Mid:</label>
+                <input type="text" id="mid" name="mid.cases" />
+            </div>
+
+            <div class="form-group">
+                <label for="severe">Severe:</label>
+                <input type="text" id="severe" name="severe.cases" />
+            </div>
+
+            <div class="form-group">
+                <label for="intubated">Intubated:</label>
+                <input type="text" id="Intubated" name="severe.intubated" />
+            </div>
+
+            <div class="form-group">
+                <label for="deceased">Deceased:</label>
+                <input type="text" id="deceased" name="deceased" />
+            </div>
+
+            <div class="form-group">
+                <label for="recovered">Recovered:</label>
+                <input type="text" id="recovered" name="recovered" />
+            </div>
+
+
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="datetime-local" id="date" name="date" />
+            </div>
+
+            <div class="form-group">
+                <label for="hospital">Hospital:</label>
+                <input type="text" id="hospital" name="treatment.hospital" />
+            </div>
+
+            <div class="form-group">
+                <label for="Home">Home:</label>
+                <input type="home" id="home" name="treatment.home" />
+            </div>
+
+            <div class="form-group">
+                <label for="apiKey">API Key:</label>
+                <input type="text" id="apiKey" name="apiKey" />
+            </div>
+
+            <input
+                    type="hidden"
+                    name="treatment.hotel"
+                    value="0"
+            />
+
+            <input
+                    type="hidden"
+                    name="treatment.undecided"
+                    value="0"
+            />
+
+
+            <input
+                    type="hidden"
+                    name="countryId"
+                    value="0bcaf8ed-0287-4b2f-87a9-9723ebca9224"
+            />
+
+            <button type="submit">Submit</button>
+            <button type="button" onclick="handleShowJSON()">Generate JSON</button>
+        </fieldset>
+    </form>
+    <div id="status"></div>
+    <pre id="JSONMountPoint"></pre>
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js" integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
+  <script>
+      function displayStatus(message) {
+          document.getElementById('status').textContent = message;
+      }
+
+      function displayJSON(obj) {
+          const JSONMountPoint = document.getElementById('JSONMountPoint');
+          JSONMountPoint.textContent = JSON.stringify(obj, null, 2);
+      }
+
+      function convertDateToUnixTimestamp(date) {
+        return parseInt((new Date(date).getTime() / 1000).toFixed(0));
+      }
+
+      function getFormData() {
+          const form = document.getElementById('statsForm');
+          const formData = Array.from(form.elements).reduce((acc, currentInput) => {
+              let { name, value } = currentInput;
+
+              if (name) {
+                 if (name === "date") value = convertDateToUnixTimestamp(value);
+                 if (!['date', 'countryId', 'apiKey'].includes(name)) value = Number(value);
+
+                  _.set(acc, name, value);
+              }
+
+              return acc;
+          }, {});
+
+          const { total, mid, severe, deceased, recovered } = formData;
+          const lightAmount = total - mid.cases - severe.cases - deceased - recovered;
+          _.set(formData, 'light.cases', lightAmount);
+          delete formData.total;
+
+          return formData;
+      }
+
+      function handleSubmit(e) {
+          const isProd = location.hostname !== 'localhost';
+          const API_URL = isProd ? 'https://api.feel.co.il' : 'http://localhost:4000';
+          const ENDPOINT = 'api/stat';
+
+          e.preventDefault();
+          const formData = getFormData();
+          const { apiKey } = formData;
+          delete formData.apiKey;
+
+          const isUserConfirmedSubmission = confirm(`About to post to ${API_URL}. Should the form be submitted?`);
+          if (isUserConfirmedSubmission) {
+              fetch(`${API_URL}/${ENDPOINT}`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'x-api-key': apiKey
+                  },
+                  body: JSON.stringify(formData)
+              })
+                  .then(res => {
+                      if (!res.ok) {
+                          displayStatus(`Failure! - Status: ${res.status}, message: ${res.statusText}`);
+                      } else {
+                          displayStatus('Success!');
+                      }
+                  })
+                  .catch((ex) => {
+                      displayStatus('Failure!');
+                      alert(JSON.stringify(ex, null, 2));
+                  })
+          }
+      }
+
+      function handleShowJSON() {
+        const formData = getFormData();
+        const derivedData = getDerivedData();
+
+        delete formData.apiKey;
+
+        displayJSON({ formData, derivedData });
+      }
+
+      function getDerivedData() {
+          const formData = getFormData();
+          const active = formData.light.cases + formData.mid.cases + formData.severe.cases;
+
+          const derivedData = {
+              total: active + formData.recovered + formData.deceased,
+              active
+          }
+
+          return derivedData;
+      }
+  </script>
+</html>
