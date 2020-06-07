@@ -187,10 +187,23 @@
       function getDerivedData() {
           const formData = getFormData();
           const active = formData.light.cases + formData.mid.cases + formData.severe.cases;
+          const total = active + formData.recovered + formData.deceased;
+
+          const f = n => n.toLocaleString();
+          const t = {
+              total: 'מקרים מאומתים',
+              active: 'פעילים',
+              severe: 'במצב קשה',
+              intubated: 'מונשמים',
+              deceased: 'נפטרים',
+              recovered: 'מחלימים',
+              and: 'ו-'
+          }
 
           const derivedData = {
-              total: active + formData.recovered + formData.deceased,
-              active
+              total,
+              active,
+              title: `${f(total)} ${t.total} (${f(active)} ${t.active}) | ${f(formData.severe.cases)} ${t.severe} (${formData.severe.intubated} ${t.intubated}) | ${f(formData.deceased)} ${t.deceased} ${t.and}${f(formData.recovered)} ${t.recovered}`
           }
 
           return derivedData;
