@@ -104,6 +104,28 @@
     <pre id="JSONMountPoint"></pre>
   </body>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js" integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.26.0/moment.min.js"></script>
+  <script>
+      window.addEventListener('load', () => {
+          const urlParams = new URLSearchParams(window.location.search);
+          const mohData = urlParams.get('moh-data')
+          if (mohData) {
+              const parsedData = JSON.parse(window.atob(mohData.replace(/b'/, '')));
+              console.log(parsedData);
+              document.getElementById('total').value = parsedData.total
+              document.getElementById('mid').value = parsedData.mid.cases
+              document.getElementById('severe').value = parsedData.severe.cases
+              document.getElementById('Intubated').value = parsedData.severe.intubated
+              document.getElementById('recovered').value = parsedData.recovered
+              document.getElementById('deceased').value = parsedData.deceased
+              document.getElementById('hospital').value = parsedData.treatment.hospital
+              document.getElementById('home').value = parsedData.treatment.home
+              document.getElementById('date').value = moment(parsedData.date).format("YYYY-MM-DDTkk:mm")
+
+          }
+      })
+  </script>
+
   <script>
       function displayStatus(message) {
           document.getElementById('status').textContent = message;
