@@ -97,7 +97,7 @@
             />
 
             <button type="submit">Submit</button>
-            <button type="button" onclick="handleShowJSON()">Generate JSON</button>
+            <button id="generate-json-btn" type="button" onclick="handleShowJSON()">Generate JSON</button>
         </fieldset>
     </form>
     <div id="status"></div>
@@ -121,7 +121,7 @@
               document.getElementById('hospital').value = parsedData.treatment.hospital
               document.getElementById('home').value = parsedData.treatment.home
               document.getElementById('date').value = moment(parsedData.date).format("YYYY-MM-DDTkk:mm")
-
+              document.getElementById('generate-json-btn').click();
           }
       })
   </script>
