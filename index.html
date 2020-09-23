@@ -63,13 +63,18 @@
             </div>
 
             <div class="form-group">
-                <label for="hospital">Hospital:</label>
-                <input type="text" id="hospital" name="treatment.hospital" />
+                <label for="Home">Home:</label>
+                <input type="home" id="home" name="treatment.home" />
             </div>
 
             <div class="form-group">
-                <label for="Home">Home:</label>
-                <input type="home" id="home" name="treatment.home" />
+                <label for="hotel">Hotel:</label>
+                <input type="text" id="hotel" name="treatment.hotel" />
+            </div>
+
+            <div class="form-group">
+                <label for="hospital">Hospital:</label>
+                <input type="text" id="hospital" name="treatment.hospital" />
             </div>
 
             <div class="form-group">
@@ -79,16 +84,9 @@
 
             <input
                     type="hidden"
-                    name="treatment.hotel"
-                    value="0"
-            />
-
-            <input
-                    type="hidden"
                     name="treatment.undecided"
                     value="0"
             />
-
 
             <input
                     type="hidden"
@@ -120,6 +118,7 @@
               document.getElementById('deceased').value = parsedData.deceased
               document.getElementById('hospital').value = parsedData.treatment.hospital
               document.getElementById('home').value = parsedData.treatment.home
+              document.getElementById('hotel').value = parsedData.treatment.hotel
               document.getElementById('date').value = moment(parsedData.date).format("YYYY-MM-DDTkk:mm")
               document.getElementById('generate-json-btn').click();
           }
