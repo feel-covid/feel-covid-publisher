@@ -175,7 +175,7 @@
           const isUserConfirmedSubmission = confirm(`About to post to ${API_URL}. Should the form be submitted?`);
           if (isUserConfirmedSubmission) {
               fetch(`${API_URL}/${ENDPOINT}`, {
-                  method: 'POST',
+                  method: 'PUT',
                   headers: {
                       'Content-Type': 'application/json',
                       'x-api-key': apiKey
