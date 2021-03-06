@@ -165,7 +165,7 @@
       function handleSubmit(e) {
           const isProd = location.hostname !== 'localhost';
           const API_URL = isProd ? 'https://api.feel.co.il' : 'http://localhost:4000';
-          const ENDPOINT = 'api/stat';
+          const ENDPOINT = 'api/hourly-updates';
 
           e.preventDefault();
           const formData = getFormData();
